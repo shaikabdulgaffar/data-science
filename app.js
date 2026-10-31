@@ -33,7 +33,7 @@ const LIBRARY_META = [
 
 /* ---- persistent state (per teacher, per browser) ---------------------- */
 let coveredSet = new Set(safeParse(localStorage.getItem("analyticsLab.covered")) || []);
-let expandedLibs = new Set(LIBRARY_META.map(l => l.folder)); // all open by default
+let expandedLibs = new Set(); // all libraries collapsed by default (click a library to open it)
 let activeTopicId = null;
 let activeVisualCleanup = null; // teardown for the currently mounted topic.visual, if any
 
@@ -640,6 +640,8 @@ const INK_COLORS = [
   { name: "Dark blue", value: "#1E40AF" },
 ];
 const INK_WIDTH = 4;
+const INK_BOX_FILL_ALPHA = 0; // Ctrl-drag highlight box: 0 = no fill (outline only)
+let inkCapsHeld = false;      // true while the Caps Lock key is physically held (see initInk)
 let inkOn = false;
 let inkMode = "draw"; // "draw" | "pointer"
 let inkColor = INK_COLORS[0].value;
@@ -685,6 +687,42 @@ function inkDot(ctx, stroke, sx, sy) {
   ctx.fill();
 }
 
+// Shapes drawn by holding a key while dragging (decided when the pen goes down):
+//   Ctrl      -> box (rectangle outline)
+//   Shift     -> arrow line (from where you press to where you release)
+//   Caps Lock -> circle / oval (fits inside the dragged box; drag a square for a perfect circle)
+function inkShape(ctx, stroke, sx, sy) {
+  const a = stroke.points[0], b = stroke.points[1] || a;
+  ctx.save();
+  if (stroke.type === "arrow") {
+    const x1 = a[0] - sx, y1 = a[1] - sy, x2 = b[0] - sx, y2 = b[1] - sy;
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    const head = Math.max(16, stroke.width * 4.5), spread = Math.PI / 7; // arrow-head size / opening angle
+    ctx.beginPath();
+    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+    ctx.moveTo(x2 - head * Math.cos(ang - spread), y2 - head * Math.sin(ang - spread));
+    ctx.lineTo(x2, y2);
+    ctx.lineTo(x2 - head * Math.cos(ang + spread), y2 - head * Math.sin(ang + spread));
+    ctx.stroke();
+  } else if (stroke.type === "ellipse") {
+    const x = Math.min(a[0], b[0]) - sx, y = Math.min(a[1], b[1]) - sy;
+    const w = Math.abs(b[0] - a[0]), h = Math.abs(b[1] - a[1]);
+    ctx.beginPath();
+    ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  } else { // "rect"
+    const x = Math.min(a[0], b[0]) - sx, y = Math.min(a[1], b[1]) - sy;
+    const w = Math.abs(b[0] - a[0]), h = Math.abs(b[1] - a[1]);
+    if (INK_BOX_FILL_ALPHA > 0) {
+      ctx.globalAlpha = INK_BOX_FILL_ALPHA;
+      ctx.fillRect(x, y, w, h);
+      ctx.globalAlpha = 1;
+    }
+    ctx.strokeRect(x, y, w, h);
+  }
+  ctx.restore();
+}
+
 function redrawInk() {
   if (!inkCanvas) return;
   const area = document.getElementById("contentArea");
@@ -694,6 +732,7 @@ function redrawInk() {
   const sx = area.scrollLeft, sy = area.scrollTop;
   (inkStrokes[inkKey()] || []).forEach((s) => {
     inkStyle(inkCtx, s);
+    if (s.type && s.type !== "free") { inkShape(inkCtx, s, sx, sy); return; }
     const n = s.points.length;
     if (n === 1) { inkDot(inkCtx, s, sx, sy); return; }
     for (let k = 0; k < n; k++) inkSegment(inkCtx, s.points, k, sx, sy);
@@ -732,16 +771,26 @@ function inkDown(e) {
   e.preventDefault();
   try { inkCanvas.setPointerCapture(e.pointerId); } catch (err) { /* pointer already gone */ }
   inkPointerId = e.pointerId;
-  inkCurrent = { color: inkColor, width: INK_WIDTH, points: [inkPoint(e)], done: 0 };
+  // Holding a key while pressing down draws a shape instead of a freehand line:
+  // Ctrl = box, Shift = arrow line, Caps Lock = circle. (No key = freehand.)
+  const type = e.ctrlKey ? "rect" : e.shiftKey ? "arrow" : inkCapsHeld ? "ellipse" : "free";
+  const isShape = type !== "free";
+  const start = inkPoint(e);
+  inkCurrent = { type, color: inkColor, width: INK_WIDTH, points: isShape ? [start, start] : [start], done: 0 };
   inkList().push(inkCurrent);
   inkClearedBackup[inkKey()] = null;
   inkStyle(inkCtx, inkCurrent);
-  inkDot(inkCtx, inkCurrent, document.getElementById("contentArea").scrollLeft, document.getElementById("contentArea").scrollTop);
+  if (!isShape) inkDot(inkCtx, inkCurrent, document.getElementById("contentArea").scrollLeft, document.getElementById("contentArea").scrollTop);
   updateInkUI();
 }
 
 function inkMove(e) {
   if (!inkCurrent || e.pointerId !== inkPointerId) return;
+  if (inkCurrent.type !== "free") { // live preview of the box / arrow / circle while dragging
+    inkCurrent.points[1] = inkPoint(e);
+    queueInkRedraw();
+    return;
+  }
   const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
   (events.length ? events : [e]).forEach((ev) => inkCurrent.points.push(inkPoint(ev)));
   const area = document.getElementById("contentArea"), p = inkCurrent.points;
@@ -753,6 +802,19 @@ function inkMove(e) {
 function inkUp(e) {
   if (!inkCurrent || e.pointerId !== inkPointerId) return;
   const p = inkCurrent.points, area = document.getElementById("contentArea");
+  if (inkCurrent.type !== "free") {
+    p[1] = inkPoint(e);
+    // A plain click (no real drag) would leave an invisible shape - drop it.
+    if (Math.abs(p[1][0] - p[0][0]) < 4 && Math.abs(p[1][1] - p[0][1]) < 4) {
+      const list = inkList(), i = list.indexOf(inkCurrent);
+      if (i !== -1) list.splice(i, 1);
+    }
+    inkCurrent = null;
+    inkPointerId = null;
+    redrawInk();
+    updateInkUI();
+    return;
+  }
   if (p.length > 1) { // the last half-segment is only drawn once the stroke ends
     inkStyle(inkCtx, inkCurrent);
     inkSegment(inkCtx, p, p.length - 1, area.scrollLeft, area.scrollTop);
@@ -779,6 +841,32 @@ function inkClear() {
   updateInkUI();
 }
 
+// Esc while the pen is in draw mode: wipe everything drawn on this page.
+// (Still undoable with the Undo button - inkClear keeps a backup.)
+function inkEscape() {
+  inkCurrent = null;       // abandon a stroke that is still being drawn
+  inkPointerId = null;
+  inkClear();
+}
+
+/* In full screen, browsers normally swallow Esc to exit full screen, so the page
+   never sees the key. Chromium browsers (Chrome, Edge, Opera) offer the Keyboard
+   Lock API: while locked, a short Esc press reaches the page (-> clears the ink)
+   and holding Esc for ~2 s still exits full screen. The lock is only held while
+   full screen + pen in draw mode, so in every other state Esc behaves as usual. */
+let inkEscLocked = false;
+function syncEscLock() {
+  const kb = navigator.keyboard;
+  if (!kb || !kb.lock) return;
+  const want = inkOn && inkMode === "draw" && !!fsElement();
+  if (want === inkEscLocked) return;
+  inkEscLocked = want;
+  try {
+    if (want) { const r = kb.lock(["Escape"]); if (r && r.catch) r.catch(() => { inkEscLocked = false; }); }
+    else if (kb.unlock) kb.unlock();
+  } catch (err) { inkEscLocked = false; }
+}
+
 function setInkMode(mode) { inkMode = mode; updateInkUI(); }
 function setInkColor(color) { inkColor = color; inkMode = "draw"; updateInkUI(); }
 
@@ -794,6 +882,7 @@ function toggleInk(force) {
 }
 
 function updateInkUI() {
+  syncEscLock();
   document.querySelectorAll("[data-ink-toggle]").forEach((b) => {
     b.classList.toggle("active", inkOn);
     b.setAttribute("aria-pressed", String(inkOn));
@@ -820,7 +909,7 @@ function buildInk() {
 
   inkBar = document.getElementById("inkBar"); // lives inside the dock, above the pen button
   inkBar.innerHTML = `
-    <button class="ink-btn" type="button" data-ink-mode="draw" title="Pen: write or draw" aria-label="Pen: write or draw"><i class="fa-solid fa-pen"></i></button>
+    <button class="ink-btn" type="button" data-ink-mode="draw" title="Pen: write or draw (hold Ctrl = box, Shift = arrow, Caps Lock = circle)" aria-label="Pen: write or draw"><i class="fa-solid fa-pen"></i></button>
     <button class="ink-btn" type="button" data-ink-mode="pointer" title="Pointer: use the page (click and scroll)" aria-label="Pointer: use the page"><i class="fa-solid fa-arrow-pointer"></i></button>
     ${INK_COLORS.map((c) => `<button class="ink-swatch" type="button" data-ink-color="${c.value}" style="--c:${c.value}" title="${c.name} pen" aria-label="${c.name} pen"></button>`).join("")}
     <button class="ink-btn" type="button" data-ink-action="undo" title="Undo" aria-label="Undo"><i class="fa-solid fa-rotate-left"></i></button>
@@ -843,6 +932,7 @@ function buildInk() {
   inkCanvas.addEventListener("pointermove", inkMove);
   inkCanvas.addEventListener("pointerup", inkUp);
   inkCanvas.addEventListener("pointercancel", inkUp);
+  inkCanvas.addEventListener("contextmenu", (e) => { if (inkMode === "draw") e.preventDefault(); }); // Ctrl+click on macOS
   // The mouse wheel keeps scrolling the page while the pen is active.
   inkCanvas.addEventListener("wheel", (e) => area.scrollBy(e.deltaX, e.deltaY), { passive: true });
 
@@ -853,9 +943,32 @@ function buildInk() {
 }
 
 function initInk() {
+  // Track whether Caps Lock is physically held. (Its on/off state can't be used:
+  // on Windows the lock stays on after you let go, which would turn every later
+  // stroke into a circle.)
+  document.addEventListener("keydown", (e) => { if (e.key === "CapsLock") inkCapsHeld = true; }, true);
+  document.addEventListener("keyup", (e) => { if (e.key === "CapsLock") inkCapsHeld = false; }, true);
+  window.addEventListener("blur", () => { inkCapsHeld = false; });
+
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-ink-toggle]")) toggleInk();
   });
+
+  // Esc clears the drawing, but only while the pen is on AND in draw mode.
+  // Pointer mode / pen closed: Esc is left alone and works as before.
+  // An open image full-view or mobile menu drawer still gets its own Esc first.
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || e.repeat) return;
+    if (!inkOn || inkMode !== "draw") return;
+    if (document.body.classList.contains("lightbox-open")) return;
+    if (document.getElementById("appShell").classList.contains("sidebar-open")) return;
+    e.preventDefault();
+    inkEscape();
+  });
+
+  // Re-check the Esc lock whenever full screen is entered or left.
+  ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange", "MSFullscreenChange"]
+    .forEach((evt) => document.addEventListener(evt, syncEscLock));
 }
 
 /* ---- copy to clipboard (with fallback for non-secure / file:// contexts) */

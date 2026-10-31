@@ -1172,3 +1172,75 @@ body.lightbox-open { overflow: hidden; }
   .mobile-topbar { height: 44px; }
   .mobile-topbar .menu-btn { width: 34px; height: 34px; }
 }
+
+/* ---- Pandas > Indexing: highlighted grids + explorer ---------------------
+   Added for the Indexing topic in pandas.js. Uses the existing colour tokens,
+   so it follows the Pandas accent automatically. */
+.idx-grid-wrap { overflow-x: auto; margin-top: 12px; }
+.idx-grid { border-collapse: separate; border-spacing: 0; font-family: "JetBrains Mono", monospace; font-size: 13px; }
+.idx-grid th, .idx-grid td {
+  padding: 7px 16px; text-align: center; white-space: nowrap;
+  border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text);
+}
+.idx-grid thead th { background: var(--bg-inset); font-weight: 600; }
+.idx-grid tbody th { background: var(--bg-inset); color: var(--accent); font-weight: 600; }
+.idx-grid thead th:not(.idx-corner) { color: var(--accent); }
+.idx-grid thead th.idx-corner { background: transparent; border-color: transparent; }
+.idx-grid small { display: block; font-size: 10px; font-weight: 500; color: var(--success); }
+.idx-grid td.is-dim { color: var(--text-faint); background: var(--bg); }
+.idx-grid td.is-sel {
+  background: rgba(63, 111, 214, 0.18);
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg-elevated));
+  border-color: var(--accent); font-weight: 600;
+  animation: idxPop 0.5s ease both; animation-delay: calc(var(--i, 0) * 90ms);
+}
+@keyframes idxPop {
+  0% { transform: scale(0.6); opacity: 0.2; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.idx-cap { margin: 8px 0 0; font-size: 12.5px; color: var(--text-muted); }
+.idx-cap strong { color: var(--text); }
+
+.idx-explorer { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.idx-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.idx-group-name { width: 64px; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--text-faint); }
+.idx-chip {
+  padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--bg-elevated); color: var(--text-muted);
+  font-family: "JetBrains Mono", monospace; font-size: 12px; transition: all 0.15s ease;
+}
+.idx-chip:hover { color: var(--accent); border-color: var(--accent); }
+.idx-chip.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+.idx-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 2px; }
+.idx-play {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 8px;
+  border: 1px solid var(--accent); color: var(--accent); font-size: 12.5px; font-weight: 500;
+}
+.idx-play:hover, .idx-play.on { background: var(--accent); color: #fff; }
+.idx-check { font-size: 12.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.idx-stage { background: var(--bg-inset); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px 16px; }
+.idx-stage-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.idx-ex-code { font-size: 14px; font-weight: 600; color: var(--text); }
+.idx-badge {
+  font-size: 11.5px; padding: 2px 10px; border-radius: 20px; color: var(--success);
+  border: 1px solid var(--success); font-family: "Space Grotesk", sans-serif;
+}
+.idx-ex-grid { min-height: 150px; }
+.idx-ex-out { margin: 12px 0 0; padding: 10px 12px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; line-height: 1.55; overflow-x: auto; }
+
+@media (prefers-reduced-motion: reduce) { .idx-grid td.is-sel { animation: none; } }
+@media (max-width: 600px) { .idx-grid th, .idx-grid td { padding: 6px 10px; } .idx-group-name { width: 100%; } }
+
+/* ---- Pandas > Filtering: True/False mask column --------------------------*/
+.idx-grid .fx-mask { font-weight: 600; font-size: 12px; border-left: 2px solid var(--border); }
+.idx-grid .fx-mask.t { color: var(--success); }
+.idx-grid .fx-mask.f { color: var(--danger); }
+.idx-grid th.fx-mask-h { color: var(--text-muted); font-weight: 500; border-left: 2px solid var(--border); }
+
+/* ---- Pandas > Indexing and Slicing: slice-end tags + part dividers -------*/
+.idx-grid small.idx-tag { margin-top: 2px; font-weight: 600; }
+.idx-grid small.idx-tag.i { color: var(--success); }
+.idx-grid small.idx-tag.x { color: var(--danger); }
+.intro-section.idx-part { margin: 34px 0 18px; padding-top: 14px; border-top: 2px solid var(--accent); }
+.intro-section.idx-part .intro-section-title { font-size: 17px; color: var(--accent); }
