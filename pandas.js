@@ -695,6 +695,316 @@
     },
   });
 
+  const SR_CODE = {"s_create": "import pandas as pd\n\ndata = {\n    \"Product\": [\"Pen\", \"Book\", \"Pencil\", \"Notebook\"],\n    \"Sales\": [50, 200, 30, 150]\n}\n\ndf = pd.DataFrame(data)\n\nprint(df)", "s_idx_create": "df = pd.DataFrame(\n    {\n        \"Product\": [\"Pen\", \"Book\", \"Pencil\", \"Notebook\"],\n        \"Sales\": [50, 200, 30, 150]\n    },\n    index=[\"d\", \"a\", \"c\", \"b\"]\n)\n\nprint(df)", "s_sort_index": "print(df.sort_index())", "s_sort_index_desc": "print(df.sort_index(ascending=False))", "s_sv_asc": "print(df.sort_values(by=\"Sales\"))", "s_sv_desc": "print(df.sort_values(by=\"Sales\", ascending=False))", "s_multi_create": "data = {\n    \"Employee\": [\"Amit\", \"Riya\", \"John\", \"Sara\", \"Ali\"],\n    \"Department\": [\"East\", \"West\", \"East\", \"North\", \"West\"],\n    \"Sales\": [400, 250, 600, 350, 300]\n}\n\ndf = pd.DataFrame(data)\n\nprint(df)", "s_multi": "print(df.sort_values(by=[\"Department\", \"Sales\"]))", "s_multi_mixed": "print(df.sort_values(\n    by=[\"Department\", \"Sales\"],\n    ascending=[True, False]\n))", "s_nan_create": "data = {\n    \"Employee\": [\"Amit\", \"Riya\", \"John\", \"Sara\"],\n    \"Sales\": [400, None, 600, 350]\n}\n\ndf = pd.DataFrame(data)\n\nprint(df)", "s_nan_first": "print(df.sort_values(by=\"Sales\", na_position=\"first\"))", "s_nan_last": "print(df.sort_values(by=\"Sales\", na_position=\"last\"))", "r_create": "import pandas as pd\n\ndf = pd.DataFrame({\n    \"Salesperson\": [\"Ali\", \"Ayesha\", \"Ravi\", \"John\", \"Sara\"],\n    \"Sales\": [500, 700, 500, 900, 300]\n})\n\ndf[\"Rank\"] = df[\"Sales\"].rank()\n\nprint(df)", "r_series": "sales = pd.Series([500, 700, 500, 900])\n\nprint(sales)", "r_average": "print(sales.rank(method=\"average\"))", "r_min": "print(sales.rank(method=\"min\"))", "r_max": "print(sales.rank(method=\"max\"))", "r_first": "print(sales.rank(method=\"first\"))", "r_dense": "print(sales.rank(method=\"dense\"))", "r_compare": "compare = pd.DataFrame({\"Sales\": sales})\n\nfor method in [\"average\", \"min\", \"max\", \"first\", \"dense\"]:\n    compare[method] = sales.rank(method=method)\n\nprint(compare)", "r_desc": "df[\"Position\"] = df[\"Sales\"].rank(\n    ascending=False,\n    method=\"dense\"\n)\n\nprint(df)", "a_create": "data = {\n    \"Name\": [\"Ali\", \"Ayesha\", \"Ravi\", \"John\", \"Sara\"],\n    \"Sales\": [500, 700, 400, 900, 600],\n    \"Region\": [\"East\", \"West\", \"East\", \"South\", \"North\"]\n}\n\ndf = pd.DataFrame(data)\n\nprint(df)", "a_select": "df = df[[\"Region\", \"Name\", \"Sales\"]]\n\nprint(df)", "a_rows": "df_rows = df.reindex([3, 0, 4, 1, 2])\n\nprint(df_rows)", "a_cols": "df_cols = df.reindex(\n    columns=[\"Sales\", \"Name\", \"Region\"]\n)\n\nprint(df_cols)"};
+  const SR_OUT = {"s_create": "    Product  Sales\n0       Pen     50\n1      Book    200\n2    Pencil     30\n3  Notebook    150", "s_idx_create": "    Product  Sales\nd       Pen     50\na      Book    200\nc    Pencil     30\nb  Notebook    150", "s_sort_index": "    Product  Sales\na      Book    200\nb  Notebook    150\nc    Pencil     30\nd       Pen     50", "s_sort_index_desc": "    Product  Sales\nd       Pen     50\nc    Pencil     30\nb  Notebook    150\na      Book    200", "s_sv_asc": "    Product  Sales\nc    Pencil     30\nd       Pen     50\nb  Notebook    150\na      Book    200", "s_sv_desc": "    Product  Sales\na      Book    200\nb  Notebook    150\nd       Pen     50\nc    Pencil     30", "s_multi_create": "  Employee Department  Sales\n0     Amit       East    400\n1     Riya       West    250\n2     John       East    600\n3     Sara      North    350\n4      Ali       West    300", "s_multi": "  Employee Department  Sales\n0     Amit       East    400\n2     John       East    600\n3     Sara      North    350\n1     Riya       West    250\n4      Ali       West    300", "s_multi_mixed": "  Employee Department  Sales\n2     John       East    600\n0     Amit       East    400\n3     Sara      North    350\n4      Ali       West    300\n1     Riya       West    250", "s_nan_create": "  Employee  Sales\n0     Amit  400.0\n1     Riya    NaN\n2     John  600.0\n3     Sara  350.0", "s_nan_first": "  Employee  Sales\n1     Riya    NaN\n3     Sara  350.0\n0     Amit  400.0\n2     John  600.0", "s_nan_last": "  Employee  Sales\n3     Sara  350.0\n0     Amit  400.0\n2     John  600.0\n1     Riya    NaN", "r_create": "  Salesperson  Sales  Rank\n0         Ali    500   2.5\n1      Ayesha    700   4.0\n2        Ravi    500   2.5\n3        John    900   5.0\n4        Sara    300   1.0", "r_series": "0    500\n1    700\n2    500\n3    900\ndtype: int64", "r_average": "0    1.5\n1    3.0\n2    1.5\n3    4.0\ndtype: float64", "r_min": "0    1.0\n1    3.0\n2    1.0\n3    4.0\ndtype: float64", "r_max": "0    2.0\n1    3.0\n2    2.0\n3    4.0\ndtype: float64", "r_first": "0    1.0\n1    3.0\n2    2.0\n3    4.0\ndtype: float64", "r_dense": "0    1.0\n1    2.0\n2    1.0\n3    3.0\ndtype: float64", "r_compare": "   Sales  average  min  max  first  dense\n0    500      1.5  1.0  2.0    1.0    1.0\n1    700      3.0  3.0  3.0    3.0    2.0\n2    500      1.5  1.0  2.0    2.0    1.0\n3    900      4.0  4.0  4.0    4.0    3.0", "r_desc": "  Salesperson  Sales  Rank  Position\n0         Ali    500   2.5       3.0\n1      Ayesha    700   4.0       2.0\n2        Ravi    500   2.5       3.0\n3        John    900   5.0       1.0\n4        Sara    300   1.0       4.0", "a_create": "     Name  Sales Region\n0     Ali    500   East\n1  Ayesha    700   West\n2    Ravi    400   East\n3    John    900  South\n4    Sara    600  North", "a_select": "  Region    Name  Sales\n0   East     Ali    500\n1   West  Ayesha    700\n2   East    Ravi    400\n3  South    John    900\n4  North    Sara    600", "a_rows": "  Region    Name  Sales\n3  South    John    900\n0   East     Ali    500\n4  North    Sara    600\n1   West  Ayesha    700\n2   East    Ravi    400", "a_cols": "   Sales    Name Region\n0    500     Ali   East\n1    700  Ayesha   West\n2    400    Ravi   East\n3    900    John  South\n4    600    Sara  North"};
+  const SR_GRID = {"s_df": {"idx": ["0", "1", "2", "3"], "cols": ["Product", "Sales"], "rows": [["Pen", "50"], ["Book", "200"], ["Pencil", "30"], ["Notebook", "150"]]}, "s_idx": {"idx": ["d", "a", "c", "b"], "cols": ["Product", "Sales"], "rows": [["Pen", "50"], ["Book", "200"], ["Pencil", "30"], ["Notebook", "150"]]}, "s_sort_index": {"idx": ["a", "b", "c", "d"], "cols": ["Product", "Sales"], "rows": [["Book", "200"], ["Notebook", "150"], ["Pencil", "30"], ["Pen", "50"]]}, "s_sv_asc": {"idx": ["c", "d", "b", "a"], "cols": ["Product", "Sales"], "rows": [["Pencil", "30"], ["Pen", "50"], ["Notebook", "150"], ["Book", "200"]]}, "s_sv_desc": {"idx": ["a", "b", "d", "c"], "cols": ["Product", "Sales"], "rows": [["Book", "200"], ["Notebook", "150"], ["Pen", "50"], ["Pencil", "30"]]}, "s_multi_df": {"idx": ["0", "1", "2", "3", "4"], "cols": ["Employee", "Department", "Sales"], "rows": [["Amit", "East", "400"], ["Riya", "West", "250"], ["John", "East", "600"], ["Sara", "North", "350"], ["Ali", "West", "300"]]}, "s_multi": {"idx": ["0", "2", "3", "1", "4"], "cols": ["Employee", "Department", "Sales"], "rows": [["Amit", "East", "400"], ["John", "East", "600"], ["Sara", "North", "350"], ["Riya", "West", "250"], ["Ali", "West", "300"]]}, "s_multi_mixed": {"idx": ["2", "0", "3", "4", "1"], "cols": ["Employee", "Department", "Sales"], "rows": [["John", "East", "600"], ["Amit", "East", "400"], ["Sara", "North", "350"], ["Ali", "West", "300"], ["Riya", "West", "250"]]}, "s_nan_df": {"idx": ["0", "1", "2", "3"], "cols": ["Employee", "Sales"], "rows": [["Amit", "400.0"], ["Riya", "NaN"], ["John", "600.0"], ["Sara", "350.0"]]}, "s_nan_first": {"idx": ["1", "3", "0", "2"], "cols": ["Employee", "Sales"], "rows": [["Riya", "NaN"], ["Sara", "350.0"], ["Amit", "400.0"], ["John", "600.0"]]}, "r_df": {"idx": ["0", "1", "2", "3", "4"], "cols": ["Salesperson", "Sales", "Rank"], "rows": [["Ali", "500", "2.5"], ["Ayesha", "700", "4.0"], ["Ravi", "500", "2.5"], ["John", "900", "5.0"], ["Sara", "300", "1.0"]]}, "r_compare": {"idx": ["0", "1", "2", "3"], "cols": ["Sales", "average", "min", "max", "first", "dense"], "rows": [["500", "1.5", "1.0", "2.0", "1.0", "1.0"], ["700", "3.0", "3.0", "3.0", "3.0", "2.0"], ["500", "1.5", "1.0", "2.0", "2.0", "1.0"], ["900", "4.0", "4.0", "4.0", "4.0", "3.0"]]}, "r_desc": {"idx": ["0", "1", "2", "3", "4"], "cols": ["Salesperson", "Sales", "Rank", "Position"], "rows": [["Ali", "500", "2.5", "3.0"], ["Ayesha", "700", "4.0", "2.0"], ["Ravi", "500", "2.5", "3.0"], ["John", "900", "5.0", "1.0"], ["Sara", "300", "1.0", "4.0"]]}, "a_df": {"idx": ["0", "1", "2", "3", "4"], "cols": ["Name", "Sales", "Region"], "rows": [["Ali", "500", "East"], ["Ayesha", "700", "West"], ["Ravi", "400", "East"], ["John", "900", "South"], ["Sara", "600", "North"]]}, "a_sel": {"idx": ["0", "1", "2", "3", "4"], "cols": ["Region", "Name", "Sales"], "rows": [["East", "Ali", "500"], ["West", "Ayesha", "700"], ["East", "Ravi", "400"], ["South", "John", "900"], ["North", "Sara", "600"]]}, "a_rows": {"idx": ["3", "0", "4", "1", "2"], "cols": ["Region", "Name", "Sales"], "rows": [["South", "John", "900"], ["East", "Ali", "500"], ["North", "Sara", "600"], ["West", "Ayesha", "700"], ["East", "Ravi", "400"]]}, "a_cols": {"idx": ["0", "1", "2", "3", "4"], "cols": ["Sales", "Name", "Region"], "rows": [["500", "Ali", "East"], ["700", "Ayesha", "West"], ["400", "Ravi", "East"], ["900", "John", "South"], ["600", "Sara", "North"]]}};
+
+  /* ---- Sorting, Ranking and Rearranging ------------------------------------ */
+  // Code, printed output and diagram data in SR_CODE / SR_OUT / SR_GRID were produced
+  // by running the code in real pandas, so every picture matches what students see.
+  const srEx = (key, label) => codeBlock(label || "Code", SR_CODE[key]) + codeBlock("Output", SR_OUT[key]);
+
+  // Diagram: a small table. hlCols (+ optional hlRows) light up with the same pop animation as Indexing.
+  const srGrid = (key, o) => {
+    o = o || {};
+    const g = SR_GRID[key], hc = o.hlCols || [], hr = o.hlRows || [];
+    let n = 0;
+    const head = g.cols.map((c) => `<th>${c}</th>`).join("");
+    const body = g.rows.map((row, i) => `<tr><th>${g.idx[i]}</th>` + row.map((v, j) => {
+      const on = hc.includes(g.cols[j]) && (!hr.length || hr.includes(i));
+      return `<td class="${on ? "is-sel" : ""}"${on ? ` style="--i:${n++}"` : ""}>${v}</td>`;
+    }).join("") + "</tr>").join("");
+    return `<div class="idx-grid-wrap"><table class="idx-grid"><thead><tr><th class="idx-corner"></th>${head}</tr></thead><tbody>${body}</tbody></table></div>` +
+      (o.caption ? `<p class="idx-cap">${o.caption}</p>` : "");
+  };
+
+  const srHero = (icon, title, tag) => `
+        <div class="intro-hero">
+          <span class="intro-hero-badge"><i class="${icon}"></i></span>
+          <div>
+            <h2 class="intro-hero-title">${title}</h2>
+            <p class="intro-hero-tag">${tag}</p>
+          </div>
+        </div>`;
+
+  const srWrap = (html) => html.replace('class="intro-table"', 'class="intro-table is-wrap"');
+
+  /* ---- Sorting ------------------------------------------------------------- */
+  registerTopic({
+    library: "pandas",
+    id: "sorting",
+    title: "Sorting",
+    difficulty: "Beginner",
+    summary: "Arrange rows in order with sort_index() and sort_values(): ascending or descending, by one or several columns, and with missing values.",
+
+    visual(panel) {
+      panel.classList.add("intro-panel");
+      panel.innerHTML = `
+        ${srHero("fa-solid fa-arrow-down-wide-short", "Sorting Data in Pandas", "Arranging data in a particular order")}
+
+        ${section("", "Introduction",
+          p("When we work with business data, we often need to organize it to make it easier to understand and analyse.") +
+          p("For example, a company may want to:") +
+          bullets([
+            "Arrange products based on their sales.",
+            "Identify the salesperson with the highest sales.",
+            "Arrange customers alphabetically.",
+            "Display important columns in a particular order.",
+          ]) +
+          p("Pandas provides different methods to perform these operations. Three important concepts are covered in this series of topics:") +
+          numlist("", [
+            ["Sorting", "arranging data in a particular order (this topic)."],
+            ["Ranking", "assigning positions to values."],
+            ["Rearranging", "changing the order of rows and columns."],
+          ])
+        )}
+
+        ${section("", "What is Sorting?",
+          p("Sorting means arranging data in a particular order. There are two common sorting orders:") +
+          bullets([
+            "<strong>Ascending order:</strong> smallest to largest (A to Z).",
+            "<strong>Descending order:</strong> largest to smallest (Z to A).",
+          ]) +
+          p("For example, consider the following sales data:") +
+          srEx("s_create") +
+          srGrid("s_df", { caption: "Rows are in the order they were entered: 0, 1, 2, 3." }) +
+          p("Suppose a company wants to arrange its products based on sales. Pandas provides two important sorting methods:") +
+          srWrap(table(["Method", "Sorts by"], [
+            ["<code>sort_index()</code>", "the index labels of the rows"],
+            ["<code>sort_values()</code>", "the actual values in one or more columns"],
+          ]))
+        )}
+
+        ${section("1", "Sorting by index: <code>sort_index()</code>",
+          sub("", "First, understand the index") +
+          p("An index is a label used to identify each row in a DataFrame. By default, Pandas assigns numbers such as <code>0</code>, <code>1</code>, <code>2</code>, and <code>3</code>. We can also assign our own labels.") +
+          srEx("s_idx_create") +
+          srGrid("s_idx", { caption: "The row labels (blue) are now <code>d, a, c, b</code>: not in alphabetical order." }) +
+          p("Now, suppose we want to arrange the rows alphabetically according to their index labels. We use <code>sort_index()</code>.") +
+          codeBlock("Syntax", "DataFrame.sort_index(axis=0, ascending=True)") +
+          srEx("s_sort_index") +
+          srGrid("s_sort_index", { caption: "The rows moved so that the labels read <code>a, b, c, d</code>. The Sales values travel with their rows." }) +
+          bullets([
+            "<code>sort_index()</code> arranges rows based on their index labels.",
+            "<code>axis=0</code> means sorting rows.",
+            "<code>ascending=True</code> means increasing order. It is the default.",
+          ]) +
+          sub("", "Reverse order") +
+          p("For reverse order, use <code>ascending=False</code>:") +
+          srEx("s_sort_index_desc") +
+          callout("fa-solid fa-lightbulb", `<p><strong>Remember:</strong> <code>sort_index()</code> sorts labels, not the actual sales values.</p>`)
+        )}
+
+        ${section("2", "Sorting by column values: <code>sort_values()</code>",
+          p("This is one of the most commonly used sorting methods in business data analysis.") +
+          p("Suppose a company wants to identify which product has the lowest or highest sales. We need to sort the actual values in the Sales column.") +
+          codeBlock("Syntax", 'DataFrame.sort_values(by="ColumnName", ascending=True)') +
+          sub("", "Ascending order (lowest first)") +
+          srEx("s_sv_asc") +
+          srGrid("s_sv_asc", { hlCols: ["Sales"], caption: "The <strong>Sales</strong> column (highlighted) now runs from smallest to largest." }) +
+          sub("", "Descending order (highest first)") +
+          p("To display the highest sales first:") +
+          srEx("s_sv_desc") +
+          srGrid("s_sv_desc", { hlCols: ["Sales"], caption: "The <strong>Sales</strong> column (highlighted) now runs from largest to smallest." }) +
+          bullets([
+            '<code>by="Sales"</code> specifies the column to sort.',
+            "<code>ascending=True</code> sorts from lowest to highest.",
+            "<code>ascending=False</code> sorts from highest to lowest.",
+          ]) +
+          callout("fa-solid fa-briefcase", `<p><strong>Business application:</strong> a sales manager can use this method to identify the best-selling and least-selling products.</p>`)
+        )}
+
+        ${section("3", "Sorting by multiple columns",
+          p("Sometimes, we need to sort data using more than one column. For example, a company wants to arrange employees according to their department and then according to their sales.") +
+          srEx("s_multi_create") +
+          sub("", "Sort by Department, then Sales") +
+          srEx("s_multi") +
+          srGrid("s_multi", { hlCols: ["Department", "Sales"], caption: "Departments are in alphabetical order; inside each department the Sales run from low to high." }) +
+          bullets([
+            "First, Pandas sorts the data by Department.",
+            "Then, it sorts Sales within each department.",
+            "By default, both columns are sorted in ascending order.",
+          ]) +
+          sub("", "Different orders for different columns") +
+          p("We can use different sorting orders for different columns by passing a list to <code>ascending</code>:") +
+          srEx("s_multi_mixed") +
+          srGrid("s_multi_mixed", { hlCols: ["Department", "Sales"], caption: "Department is A to Z, but Sales are now highest first inside each department." }) +
+          bullets([
+            "Department is sorted alphabetically.",
+            "Sales are sorted from highest to lowest within each department.",
+          ])
+        )}
+
+        ${section("4", "Handling missing values while sorting",
+          p("Sometimes, datasets contain missing values (<code>NaN</code>). By default, Pandas places missing values at the bottom when sorting. We can control their position using <code>na_position</code>.") +
+          srEx("s_nan_create") +
+          srEx("s_nan_first") +
+          srGrid("s_nan_first", { hlCols: ["Sales"], hlRows: [0], caption: "With <code>na_position=\"first\"</code>, the missing value (highlighted) moves to the top." }) +
+          bullets([
+            '<code>na_position="first"</code> – missing values appear first.',
+            '<code>na_position="last"</code> – missing values appear last (default).',
+          ]) +
+          p("For comparison, here is the default behaviour:") +
+          srEx("s_nan_last")
+        )}
+
+        ${section("", "Summary",
+          srWrap(table(["Goal", "Code"], [
+            ["Sort rows by their index labels", "<code>df.sort_index()</code>"],
+            ["Sort by one column, lowest first", '<code>df.sort_values(by="Sales")</code>'],
+            ["Sort by one column, highest first", '<code>df.sort_values(by="Sales", ascending=False)</code>'],
+            ["Sort by several columns", '<code>df.sort_values(by=["Department", "Sales"])</code>'],
+            ["Different order per column", '<code>df.sort_values(by=[...], ascending=[True, False])</code>'],
+            ["Put missing values first", '<code>df.sort_values(by="Sales", na_position="first")</code>'],
+          ]))
+        )}
+      `;
+    },
+  });
+
+  /* ---- Ranking ------------------------------------------------------------- */
+  registerTopic({
+    library: "pandas",
+    id: "ranking",
+    title: "Ranking",
+    difficulty: "Beginner",
+    summary: "Assign positions to values with rank(): how ties are handled by average, min, max, first and dense, and how to rank from highest to lowest.",
+
+    visual(panel) {
+      panel.classList.add("intro-panel");
+      panel.innerHTML = `
+        ${srHero("fa-solid fa-ranking-star", "Ranking Data in Pandas", "Assigning positions to values")}
+
+        ${section("", "What is Ranking?",
+          p("Ranking means assigning a position or rank to each value based on its order.") +
+          p("Think about an examination. Suppose five students receive the following marks:") +
+          table(["Student", "Marks"], [["Ali", "80"], ["Ayesha", "95"], ["Ravi", "80"], ["John", "90"], ["Sara", "70"]]) +
+          p("We want to identify the position of each student based on their marks. For this purpose, Pandas provides the <code>rank()</code> method.") +
+          codeBlock("Syntax", 'Series.rank(method="average", ascending=True)') +
+          callout("fa-solid fa-circle-info", `<p>By default, ranking is performed in ascending order, meaning the <strong>smallest value receives rank 1</strong>.</p>`)
+        )}
+
+        ${section("", "Example: ranking sales",
+          srEx("r_create") +
+          srGrid("r_df", { hlCols: ["Sales", "Rank"], hlRows: [0, 2], caption: "Ali and Ravi (highlighted) have equal sales, so they share a rank." }) +
+          bullets([
+            "Sara receives rank 1 because she has the lowest sales.",
+            "Ali and Ravi have the same sales, so both receive rank 2.5.",
+            "Ayesha receives rank 4.",
+            "John receives rank 5.",
+          ]) +
+          callout("fa-solid fa-circle-question", `<p><strong>Why do Ali and Ravi receive 2.5?</strong> Because both occupy the second and third positions. Their average rank is (2 + 3) / 2 = 2.5. This is the default ranking method in Pandas.</p>`)
+        )}
+
+        ${section("1", "Ranking methods",
+          p("When two or more values are equal, Pandas provides different methods to assign ranks. Consider these sales values:") +
+          srEx("r_series") +
+          sub("1.", "<code>average</code> (default)") +
+          p("Assigns the average of the positions to equal values.") + srEx("r_average") +
+          sub("2.", "<code>min</code>") +
+          p("Assigns the smallest available rank to equal values.") + srEx("r_min") +
+          sub("3.", "<code>max</code>") +
+          p("Assigns the largest available rank to equal values.") + srEx("r_max") +
+          sub("4.", "<code>first</code>") +
+          p("Assigns ranks based on the order in which values appear.") + srEx("r_first") +
+          sub("5.", "<code>dense</code>") +
+          p("Assigns equal values the same rank without leaving gaps in the ranking.") + srEx("r_dense") +
+          sub("", "All five methods side by side") +
+          srEx("r_compare") +
+          srGrid("r_compare", { hlCols: ["average", "min", "max", "first", "dense"], hlRows: [0, 2], caption: "Only the tied rows (highlighted) differ between methods. Rows 1 and 3 get the same rank every time, except that <code>dense</code> leaves no gap after the tie." }) +
+          sub("", "Easy way to remember") +
+          srWrap(table(["Method", "Meaning"], [
+            ["<code>average</code>", "Average of tied ranks"],
+            ["<code>min</code>", "Smallest tied rank"],
+            ["<code>max</code>", "Largest tied rank"],
+            ["<code>first</code>", "Based on appearance"],
+            ["<code>dense</code>", "No gaps between ranks"],
+          ]))
+        )}
+
+        ${section("2", "Ranking in descending order",
+          p("In business, we often want to identify the highest-performing employee as Rank 1. For this, we use <code>ascending=False</code>.") +
+          srEx("r_desc") +
+          srGrid("r_desc", { hlCols: ["Position"], caption: "In the new <strong>Position</strong> column, John (highest sales) is 1. Ali and Ravi tie at 3 and Sara, with the lowest sales, is 4." }) +
+          p("Now, the salesperson with the highest sales receives Rank 1.") +
+          callout("fa-solid fa-briefcase", `<p><strong>Business application:</strong> ranking is useful for identifying top-performing employees, best-selling products, and high-performing branches.</p>`) +
+          callout("fa-solid fa-lightbulb", `<p><strong>Sorting vs ranking:</strong> <code>sort_values()</code> moves the rows into a new order, while <code>rank()</code> leaves the rows where they are and adds a number that says each row's position.</p>`)
+        )}
+
+        ${section("", "Summary",
+          srWrap(table(["Goal", "Code"], [
+            ["Rank lowest to highest (default)", '<code>df["Sales"].rank()</code>'],
+            ["Rank highest first", '<code>df["Sales"].rank(ascending=False)</code>'],
+            ["Ties share the smallest rank", '<code>df["Sales"].rank(method="min")</code>'],
+            ["Ties share the largest rank", '<code>df["Sales"].rank(method="max")</code>'],
+            ["Break ties by order of appearance", '<code>df["Sales"].rank(method="first")</code>'],
+            ["No gaps after ties", '<code>df["Sales"].rank(method="dense")</code>'],
+          ]))
+        )}
+      `;
+    },
+  });
+
+  /* ---- Rearranging --------------------------------------------------------- */
+  registerTopic({
+    library: "pandas",
+    id: "rearranging",
+    title: "Rearranging",
+    difficulty: "Beginner",
+    summary: "Change the order of columns by selection and the order of rows or columns with reindex().",
+
+    visual(panel) {
+      panel.classList.add("intro-panel");
+      panel.innerHTML = `
+        ${srHero("fa-solid fa-arrows-up-down-left-right", "Rearranging Data in Pandas", "Changing the order of rows and columns")}
+
+        ${section("", "What is Rearranging?",
+          p("Rearranging means changing the order or position of rows and columns in a DataFrame.") +
+          p("For example:") +
+          bullets([
+            "Moving the Region column before the Name column.",
+            "Changing the order of rows.",
+            "Displaying columns in a required sequence.",
+          ]) +
+          p("Consider this DataFrame:") +
+          srEx("a_create") +
+          srGrid("a_df", { caption: "Columns are in the order <strong>Name, Sales, Region</strong>; rows are labelled 0 to 4." })
+        )}
+
+        ${section("1", "Rearranging columns using selection",
+          p("Suppose we want to display Region first, Name second, and Sales third. We can select the columns in our required order.") +
+          srEx("a_select") +
+          srGrid("a_sel", { hlCols: ["Region"], caption: "Region (highlighted) moved to the front. The data in each column did not change, only the order." }) +
+          callout("fa-solid fa-circle-info", `<p><strong>Explanation:</strong> the order of column names inside the list determines their display order.</p>`)
+        )}
+
+        ${section("2", "Rearranging rows using <code>reindex()</code>",
+          p("Sometimes, we want to display rows in a particular order. Pandas provides the <code>reindex()</code> method.") +
+          srEx("a_rows") +
+          srGrid("a_rows", { caption: "The rows now appear in the order 3, 0, 4, 1, 2. Each row keeps its original label." }) +
+          bullets([
+            "First, we specify the required index order.",
+            "Pandas rearranges the rows according to that order.",
+            "The original index labels remain unchanged.",
+          ]) +
+          sub("", "Rearranging columns with <code>reindex()</code>") +
+          p("We can also rearrange columns using <code>reindex()</code>:") +
+          srEx("a_cols") +
+          srGrid("a_cols", { hlCols: ["Sales"], caption: "This displays the columns in the specified order: Sales, Name, Region." })
+        )}
+
+        ${section("", "Summary",
+          srWrap(table(["Goal", "Code"], [
+            ["Put columns in a chosen order", '<code>df[["Region", "Name", "Sales"]]</code>'],
+            ["Put rows in a chosen order", "<code>df.reindex([3, 0, 4, 1, 2])</code>"],
+            ["Put columns in a chosen order with reindex", '<code>df.reindex(columns=["Sales", "Name", "Region"])</code>'],
+          ]))
+        )}
+      `;
+    },
+  });
+
+
   /* ---- Merging (joins with pd.merge) ------------------------------------ */
   // Same two small tables in every example, so students can compare the
   // four joins directly: customers 3 and 4 have no sales, and order 104
